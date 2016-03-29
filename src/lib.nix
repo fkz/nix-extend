@@ -17,6 +17,8 @@
             scopedImport = x: currentScopedImport (self // x);
           };
       in self;
+
+  # it would be better if we could get them directly from nix somehow
   builtinsWithoutHiding = [
     "builtins"
     "true" "false" "null"
@@ -27,13 +29,11 @@
   unpureBuiltins = [
     "__currentTime"
     "__currentSystem"
-    "__nixVersion"
+    #"__nixVersion"
     "__storeDir"
-
+    #TODO add the rest
   ];
   importWithOverrides = overrides: path: scopedImport (overrideBuiltins overrides) path;
+
+  dontAllowUnpure = builtins.listToAttrs (map (name: { inherit name; value = throw "${name} is unpure and thus not allowed inside this file"; }) unpureBuiltins);
 }
-
-
-
-
